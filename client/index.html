@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Twitter App</title>
+
+
+
+</head>
+
+<body>
+    <div id="app">
+        <h1>{{ this.message }}</h1>
+
+        <h2>Here is an answer to your question!</h2>
+        <button v-on:click="yesno()">Try yes/no API</button>
+        <p> {{ answer }} </p>
+
+        <h2>Twitter</h2>
+        <input type="text" v-model="query" />
+        <button v-on:click="twitterGetStuff()">Submit</button>
+        <p>{{ query }}</p>
+        <p> {{ tweetArr }}</p>
+
+        <h1>Try a tweet embed below</h1>
+        
+        <div v-for="tweet in tweetArr"></div>
+    </div>
+
+
+    <!-- install Vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <!-- <script src="./node_modules/vue/dist/vue.js"></script> -->
+    <!-- <script src="../node_modules/vue/dist/vue.js"></script> -->
+
+    <!-- install axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- <script src="../node_modules/axios/dist/axios.js"></script> -->
+
+    <script>
+    window.twttr = (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0],
+            t = window.twttr || {};
+        if (d.getElementById(id)) return t;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+        
+        t._e = [];
+        t.ready = function(f) {
+            t._e.push(f);
+        };
+        
+        return t;
+        }(document, "script", "twitter-wjs"));
+    </script>
+
+    <script>
+        
+        var app = new Vue({
+            el: '#app',
+            data: {
+                "message": 'Vue app!',
+                "answer": "this will change",
+                "query": "trump",
+                "server": "http://localhost:3000/query/",
+                "statuses": "",
+                "tweetArr": ['test'],
+                "statusArr": ['test']
+
+            },
+            methods: {
+                yesno: function () {
+                    axios.get('https://yesno.wtf/api')
+                        .then((response) => {
+                            console.log(response);
+                            console.log(response.data.answer);
+                            this.answer = response.data.answer;
+                        });
+
+                },
+                twitterGetStuff: function () {
+                    self = this;
+                    let status;
+                    console.log("query:", self.query)
+                    console.log(`${self.server}${self.query}`) 
+                    axios.get(`${self.server}${self.query}`)
+                        .then( (response) => {
+                            console.log(response);
+                            console.log(response.status);
+                            status = response.data.statuses;
+                            console.log("status:",status)
+                            this.createTweetArr(status);
+                        }
+                    );
+                    
+                    
+                },
+                createTweetArr: function (statusArr) {
+                    self = this;
+                    self.tweetArr = [];
+                    for (let i = 0; i < statusArr.length; i++){
+                        console.log(statusArr[i].user.screen_name);
+                        self.tweetArr.push(`https://publish.twitter.com/oembed?url=https://twitter.com/${statusArr[i].user.screen_name}/status/${statusArr[i].id_str}`)
+                    }
+                    return self.tweetArr
+                },
+                twitterEmbedHTML: function(url){
+                    axios.all(url)
+                        .then( (response) => {
+                            console.log(response);
+                            console.log(response.html);
+                        } )
+                },
+                createTwitterEmbedUrl: function(id_str, user){
+                    let url =`https://publish.twitter.com/oembed?url=https://twitter.com/${user}/status/${id_str}`
+                    return url;
+                }
+            }
+        });
+    </script>
+
+
+
+</body>
+
+</html>
