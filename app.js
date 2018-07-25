@@ -16,7 +16,7 @@ let client = new twitter({
 //Set up your search parameters
 let params = {
     q: 'game of thrones',
-    count: 10,
+    count: 1,
     result_type: 'recent',
     lang: 'en'
 }
@@ -36,16 +36,23 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 const path = require('path');
+const axios = require('axios');
+const CircularJSON = require('circular-json');
+const bodyParser = require('body-parser');
+const fetch = require("node-fetch");
 
+//use cors
 app.use(cors());
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname + "/client/index.html")));
 
 app.get('/query/:query', (req, res) => {
     client.get('search/tweets', {
             q: req.params.query,
-            count: 10,
+            count: 1,
             result_type: 'recent',
             lang: 'en'
         },
@@ -58,5 +65,40 @@ app.get('/query/:query', (req, res) => {
     );
     res.json(tweeter);
 });
+
+app.get('/twitterhtml/:url', (req, res) => {
+    console.log("url is:",req.params.url);
+    // axios.get(req.params.url).then((response)=>{
+    //     // console.log("html:", response.html);
+    //     // let stringy = JSON.stringify(response); 
+    //     let json = CircularJSON.stringify(response);
+    //     console.log(json)
+    //     res.json(json);
+    // }).catch((error)=>console.log("error in app.js twitterhtml route", error));
+    
+    axios.get('https://publish.twitter.com/oembed?url=https://twitter.com/truthpiks/status/1021770039811350529')
+        .then((response)=>{
+        // console.log("html:", response.html);
+        console.log("response from axios:", response);
+        // let stringy = JSON.stringify(response); 
+        // console.log(stringy)
+        res.json(response.data);
+    }).catch((error)=>console.log("error in app.js twitterhtml route", error));
+    
+    // fetch('https://publish.twitter.com/oembed?url=https://twitter.com/truthpiks/status/1021770039811350529')
+    //     .then(response => response.json)
+    //     .then(json => {
+    //         console.log("did it get to json fetch??")
+    //         console.log(json);
+    //         res.json(json);
+    //     })
+    //     .catch((error)=>console.log("error in app.js twitterhtml route", error));
+
+    // axios.get(req.params.url).then((response)=>{
+    //     console.log("html:", response.html);
+    //     res.json(response);
+    // }).catch((error)=>console.log("error in app.js twitterhtml route", error));
+});
+
 
 app.listen(3000, () => console.log('App listening on port 3000!'));

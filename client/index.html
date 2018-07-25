@@ -22,12 +22,36 @@
         <h2>Twitter</h2>
         <input type="text" v-model="query" />
         <button v-on:click="twitterGetStuff()">Submit</button>
-        <p>{{ query }}</p>
-        <p> {{ tweetArr }}</p>
+        <p>Query is: <span style="background-color: lightyellow;">{{ query }}</span></p>
+        <p> tweetArray is: <span style="background-color: lightyellow;">{{ tweetArr }}</span></p>
 
         <h1>Try a tweet embed below</h1>
         
-        <div v-for="tweet in tweetArr"></div>
+        <div v-if="tweetArr[0] != 'test' && tweetArr.length > 0 && tweetArr != undefined">
+            <div v-for="tweet in tweetArr">
+                <div v-if="tweet">{{ tweet }}</div>
+
+                <div v-if="tweet">
+                    <!-- <div v-html="twitterGetEmbedHTML(tweet)"></div> -->
+                    <!-- <div v-html="'<h2>does this work?</h2>'"></div> -->
+                    <!-- <div>{{twitterGetEmbedHTML(tweet)}}</div> -->
+                    <div v-html="tweetHtml"></div>
+                    <br />
+                    <p>{{tweetHtml}}</p>
+                </div>
+            </div>
+        </div>
+        <p v-else>Nothing here yet</p>
+        <h1>Test HTML below</h1>
+        <blockquote class="twitter-tweet">
+            <p lang="en" dir="ltr">This video clip alone shows that 
+                <a href="https://twitter.com/realDonaldTrump?ref_src=twsrc%5Etfw">@realDonaldTrump</a> needs to take away Clappers security clearances. 
+                <br><br>He flat out lies...”There was no FISA warrant order to surveil Trump or his campaign” ....”There was no wiretapping”~ Clapper
+                <br><br>This is beyond nauseating. <a href="https://t.co/Ha2P69P3Hq">pic.twitter.com/Ha2P69P3Hq</a>
+            </p>&mdash; Mary 💋🇺🇸 (@USAHotLips) <a href="https://twitter.com/USAHotLips/status/1021753621627772928?ref_src=twsrc%5Etfw">July 24, 2018</a>
+        </blockquote>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
     </div>
 
 
@@ -68,10 +92,17 @@
                 "answer": "this will change",
                 "query": "trump",
                 "server": "http://localhost:3000/query/",
+                "twitterHtmlUrl": "http://localhost:3000/twitterhtml/",
                 "statuses": "",
                 "tweetArr": ['test'],
-                "statusArr": ['test']
+                "statusArr": ['test'],
+                "tweetHtml": "<h3>testing the tweetHTML</h3>",
 
+            },
+            watch: {
+                tweetArr: function() {
+                    this.twitterGetEmbedHTML(this.tweetArr[0])
+                }
             },
             methods: {
                 yesno: function () {
@@ -95,8 +126,8 @@
                             status = response.data.statuses;
                             console.log("status:",status)
                             this.createTweetArr(status);
-                        }
-                    );
+                        })
+                        .catch(error => console.log("error in twitterGetStuff:",error))
                     
                     
                 },
@@ -104,22 +135,36 @@
                     self = this;
                     self.tweetArr = [];
                     for (let i = 0; i < statusArr.length; i++){
-                        console.log(statusArr[i].user.screen_name);
                         self.tweetArr.push(`https://publish.twitter.com/oembed?url=https://twitter.com/${statusArr[i].user.screen_name}/status/${statusArr[i].id_str}`)
+                        // self.tweetArr.push(`{"screen_name":${statusArr[i].user.screen_name},"id_str":${statusArr[i].id_str}}`)
                     }
+                    console.log("tweetArr is:",self.tweetArr);
                     return self.tweetArr
                 },
-                twitterEmbedHTML: function(url){
-                    axios.all(url)
+                // twitterEmbedHTML: function(url){
+                //     axios.all(url)
+                //         .then( (response) => {
+                //             console.log(response);
+                //             console.log(response.html);
+                //         } )
+                // },
+                // createTwitterEmbedUrl: function(id_str, user){
+                //     let userAndIdObj =`{"user":${user},"id_str":${id_str}}`;
+                //     return url;
+                // },
+                twitterGetEmbedHTML: function(url) {
+                    let html;
+                    this.tweetHtml = "here is a change for tweetHTML"
+                    axios.get(`http://localhost:3000/twitterhtml/test`)
                         .then( (response) => {
-                            console.log(response);
-                            console.log(response.html);
-                        } )
-                },
-                createTwitterEmbedUrl: function(id_str, user){
-                    let url =`https://publish.twitter.com/oembed?url=https://twitter.com/${user}/status/${id_str}`
-                    return url;
-                }
+                            html = response.data.html;
+                            console.log("html is:", html);
+                            console.log("response from twittergetembedhtml is:",response)
+                            this.tweetHtml = response.data.html;
+                            console.log("this.tweetHtml is:", this.tweetHtml)
+                        }
+                        ).catch(error=>console.log("error!",error) )
+                } 
             }
         });
     </script>
