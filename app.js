@@ -19,9 +19,9 @@ let client = new twitter({
 //     count: 1,
 //     result_type: 'recent',
 //     lang: 'en'
-}
+// }
 
-let tweeter;
+// let tweeter;
 // client.get('search/tweets', params, function(error, tweets, response) {
 //     if(error) throw error;
 //     console.log(tweets.statuses[0].text);  // The favorites.
@@ -50,6 +50,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.get('/', (req, res) => res.sendFile(path.join(__dirname + "/client/index.html")));
 
 app.get('/query', (req, res) => {
+    let tweeter;
     const count = req.query.count || 10
     let params = {
         q: req.query.search,
@@ -66,9 +67,10 @@ app.get('/query', (req, res) => {
             console.log(tweets.statuses[0].text); // The favorites.
             // console.log(response);  // Raw response object.
             tweeter = tweets
+            res.json(tweeter);
         }
     );
-    res.json(tweeter);
+    
 });
 
 app.get('/twitterhtml/:url', (req, res) => {
