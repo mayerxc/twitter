@@ -3,11 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
     <title>Twitter App</title>
 
-
+    <!-- install vue material -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/theme/default.css">
 
 </head>
 
@@ -57,8 +61,11 @@
 
     <!-- install Vue -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-    <!-- <script src="./node_modules/vue/dist/vue.js"></script> -->
     <!-- <script src="../node_modules/vue/dist/vue.js"></script> -->
+    <!-- <script src="https://unpkg.com/vue"></script> -->
+
+    <!-- install vue material -->
+    <script src="https://unpkg.com/vue-material@beta"></script>
 
     <!-- install axios -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -85,6 +92,8 @@
 
     <script>
         
+        Vue.use(VueMaterial.default)
+
         var app = new Vue({
             el: '#app',
             data: {

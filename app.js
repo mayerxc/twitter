@@ -100,5 +100,5 @@ app.get('/twitterhtml/:url', (req, res) => {
     // }).catch((error)=>console.log("error in app.js twitterhtml route", error));
 });
 
-
-app.listen(3000, () => console.log('App listening on port 3000!'));
+let port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`App listening on port ${port}!`));
