@@ -52,7 +52,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname + "/client/index.htm
 app.get('/query/:query', (req, res) => {
     client.get('search/tweets', {
             q: req.params.query,
-            count: 1,
+            count: 10,
             result_type: 'recent',
             lang: 'en'
         },
