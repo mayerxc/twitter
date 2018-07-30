@@ -14,11 +14,11 @@ let client = new twitter({
 });
 
 //Set up your search parameters
-let params = {
-    q: 'game of thrones',
-    count: 1,
-    result_type: 'recent',
-    lang: 'en'
+// let params = {
+//     q: 'game of thrones',
+//     count: 1,
+//     result_type: 'recent',
+//     lang: 'en'
 }
 
 let tweeter;
@@ -37,9 +37,9 @@ const cors = require('cors')
 const app = express();
 const path = require('path');
 const axios = require('axios');
-const CircularJSON = require('circular-json');
+// const CircularJSON = require('circular-json');
 const bodyParser = require('body-parser');
-const fetch = require("node-fetch");
+// const fetch = require("node-fetch");
 
 //use cors
 app.use(cors());
@@ -49,14 +49,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname + "/client/index.html")));
 
-app.get('/query/:query', (req, res) => {
-    client.get('search/tweets', {
-            q: req.params.query,
-            count: 10,
-            result_type: 'recent',
-            lang: 'en'
-        },
-        function (error, tweets, response) {
+app.get('/query', (req, res) => {
+    const count = req.query.count || 10
+    let params = {
+        q: req.query.search,
+        "count": count,
+        result_type: 'recent',
+        lang: 'en'
+    }
+    //include location if it's in the url
+    if (req.query.geocode) {
+        params['geocode'] = req.query.geocode;
+    }
+    client.get('search/tweets', params, function (error, tweets, response) {
             if (error) throw error;
             console.log(tweets.statuses[0].text); // The favorites.
             // console.log(response);  // Raw response object.
